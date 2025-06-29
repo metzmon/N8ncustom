@@ -58,3 +58,7 @@ ENV PUPPETEER_EXECUTABLE_PATH=/usr/bin/chromium-browser
 EXPOSE 5678
 
 # Entrypoint og CMD er arvet fra base-imaget.
+npm install @custom-js/n8n-nodes-pdf-toolkit @brave/n8n-nodes-brave-search \
+  n8n-nodes-apify n8n-nodes-mcp-client n8n-nodes-deepseek n8n-nodes-elevenlabs \
+  n8n-nodes-globals n8n-nodes-pdfkit
+
