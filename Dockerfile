@@ -8,7 +8,7 @@
 # Anvend et ARG-argument til nemt at kunne skifte n8n-version.
 # Det anbefales stærkt at låse til en specifik version i produktion.
 # Find nyeste versioner her: https://hub.docker.com/r/n8nio/n8n/tags
-ARG N8N_VERSION=1.45.1
+ARG N8N_VERSION=latest
 
 # Start fra den officielle n8n-image baseret på Alpine Linux for en lille størrelse.
 FROM n8nio/n8n:${N8N_VERSION}
