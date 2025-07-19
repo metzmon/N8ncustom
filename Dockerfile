@@ -28,6 +28,10 @@ RUN apk update && apk upgrade && \
     && rm -rf /var/cache/apk/*
 
 # --- Custom nodes installation into proper extension path ---
+# 0. Install pnpm globally first (required)
+RUN npm install -g pnpm
+
+# 1. Install custom nodes properly
 RUN mkdir -p /home/node/.n8n/custom-nodes && \
     cd /home/node/.n8n/custom-nodes && \
     pnpm add n8n-nodes-elevenlabs@latest \
