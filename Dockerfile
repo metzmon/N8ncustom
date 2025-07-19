@@ -34,7 +34,6 @@ RUN npm install -g pnpm
 # 1. Install custom nodes properly
 RUN mkdir -p /home/node/.n8n/custom-nodes && \
     cd /home/node/.n8n/custom-nodes && \
-    pnpm add n8n-nodes-elevenlabs@latest \
 
 # --- Make sure n8n loads those nodes ---
 ENV N8N_CUSTOM_EXTENSIONS=/home/node/.n8n/custom-nodes
