@@ -1,38 +1,51 @@
-FROM n8nio/n8n:1.37.0
+# ==============================================================================
+# === N8N "SUPERCHARGED" DOCKERFILE FOR RAILWAY (STABLE VERSION) ==============
+# ==============================================================================
+# Maintains all your tools and adds Railway-specific fixes
+# ==============================================================================
 
-# 1) Switch to root so we can fix permissions and create folders
+ARG N8N_VERSION=1.37.0
+FROM n8nio/n8n:${N8N_VERSION}
+
+# Switch to root for installations
 USER root
 
-# 2) Create all the writable dirs and default config.json
-RUN mkdir -p /home/node/.n8n \
-         /data \
-         /usr/app/storage/.n8n && \
-    # Set up an empty config.json so n8n never errors on missing file
-    echo '{}' > /data/config.json && \
-    # Give node user ownership and full rw for these paths
-    chown -R node:node /home/node /data /usr/app/storage && \
-    chmod -R 777 /home/node /data /usr/app/storage
-
-# 3) Install only the minimal packages you need
-RUN apk update && \
+# Install all packages in single layer (your original set)
+RUN apk update && apk upgrade && \
     apk add --no-cache \
-      bash \
-      curl \
-      chromium
+    ffmpeg \
+    graphicsmagick \
+    chromium \
+    nss \
+    freetype \
+    harfbuzz \
+    ttf-freefont \
+    git \
+    jq \
+    curl \
+    wget \
+    zip \
+    unzip \
+    bash \
+    python3 \
+    py3-pip \
+    && rm -rf /var/cache/apk/*
 
-# 4) Point n8n at /data for both its config file and its user folder
-ENV N8N_CONFIG_PATH=/data \
-    N8N_USER_FOLDER=/data \
-    RAILWAY_SHELL=enabled \
-    PUPPETEER_SKIP_CHROMIUM_DOWNLOAD=true \
-    PUPPETEER_EXECUTABLE_PATH=/usr/bin/chromium-browser
+# Configure Puppeteer
+ENV PUPPETEER_SKIP_CHROMIUM_DOWNLOAD=true
+ENV PUPPETEER_EXECUTABLE_PATH=/usr/bin/chromium-browser
 
-# 5) Healthcheck for Railway
+# Railway-specific fixes
+RUN mkdir -p /home/node/.n8n && \
+    chown -R node:node /home/node && \
+    chmod -R 755 /home/node
+
+# Enable Railway shell and health check
+ENV RAILWAY_SHELL=enabled \
+    N8N_HOST=0.0.0.0
 HEALTHCHECK --interval=30s --timeout=10s \
-  CMD curl -f http://localhost:5678/healthz || exit 1
+    CMD curl -f http://localhost:5678/healthz || exit 1
 
-# 6) Drop back to the non-root user
+# Switch back to non-root user
 USER node
-
-# 7) Expose the port n8n listens on
 EXPOSE 5678
