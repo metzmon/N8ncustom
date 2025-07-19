@@ -30,7 +30,12 @@ RUN apk update && apk upgrade && \
     py3-pip \
     && \
     rm -rf /var/cache/apk/*
-
+    
+RUN pnpm install \
+    n8n-nodes-elevenlabs@latest \
+    n8n-nodes-openai@latest \
+    n8n-nodes-google-drive@latest
+    
 ENV PUPPETEER_SKIP_CHROMIUM_DOWNLOAD=true
 ENV PUPPETEER_EXECUTABLE_PATH=/usr/bin/chromium-browser
 
