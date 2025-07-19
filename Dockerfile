@@ -35,7 +35,6 @@ RUN npm install -g pnpm
 RUN mkdir -p /home/node/.n8n/custom-nodes && \
     cd /home/node/.n8n/custom-nodes && \
     pnpm add n8n-nodes-elevenlabs@latest \
-             n8n-nodes-openai@latest \
 
 # --- Make sure n8n loads those nodes ---
 ENV N8N_CUSTOM_EXTENSIONS=/home/node/.n8n/custom-nodes
