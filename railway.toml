@@ -1,5 +1,2 @@
-[service]
 shell = true
-
-[build]
 builder = "docker"
