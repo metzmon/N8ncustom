@@ -6,7 +6,7 @@ FROM n8nio/n8n:${N8N_VERSION}
 
 USER root
 
-# 1) System dependencies for media & headless Chromium
+# 1) System deps for media & headless Chromium
 RUN apk update && apk upgrade && \
     apk add --no-cache \
       ffmpeg \
@@ -27,16 +27,16 @@ RUN apk update && apk upgrade && \
       py3-pip \
     && rm -rf /var/cache/apk/*
 
-# 2) Puppeteer & settings-file permission lockdown
+# 2) Puppeteer & settings-file lockdown
 ENV PUPPETEER_SKIP_CHROMIUM_DOWNLOAD=true \
     PUPPETEER_EXECUTABLE_PATH=/usr/bin/chromium-browser \
     N8N_ENFORCE_SETTINGS_FILE_PERMISSIONS=true
 
-# 3) Switch back to non-root user
+# 3) Switch back to the non-root n8n user
 USER node
 
-# 4) Expose n8n’s default port
+# 4) Expose n8n’s port
 EXPOSE 5678
 
-# 5) Force the correct start command
+# 5) **Directly start n8n** — NO npm, NO pnpm
 ENTRYPOINT ["n8n", "start"]
