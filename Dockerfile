@@ -30,11 +30,14 @@ RUN apk update && apk upgrade && \
 # --- Install pnpm ---
 RUN npm install -g pnpm
 
-# --- Install custom nodes ---
+# --- Install valid community nodes only ---
 RUN mkdir -p /home/node/.n8n/custom-nodes && \
     cd /home/node/.n8n/custom-nodes && \
-    pnpm add n8n-nodes-elevenlabs@latest \
-             n8n-nodes-openai@latest
+    pnpm add n8n-nodes-elevenlabs@latest
+
+# --- Tell n8n to load from that folder ---
+ENV N8N_CUSTOM_EXTENSIONS=/home/node/.n8n/custom-nodes
+
 
 # --- Tell n8n to load from the custom extension path ---
 ENV N8N_CUSTOM_EXTENSIONS=/home/node/.n8n/custom-nodes
