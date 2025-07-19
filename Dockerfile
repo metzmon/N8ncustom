@@ -1,45 +1,26 @@
-# ==============================================================================
 FROM n8nio/n8n:1.37.0
 
-# === CRITICAL FIX STARTS ===
+# Fix all permission issues
 USER root
-RUN mkdir -p /home/node/.n8n && chown -R node:node /home/node
-# === CRITICAL FIX ENDS ===
-
-# Install tools
-RUN apk update && \
-    apk add --no-cache \
-    ffmpeg \
-    graphicsmagick \
-    chromium \
-    git \
-    jq \
-    curl \
-    wget \
-    zip \
-    unzip \
-    bash \
-    python3 \
-    py3-pip
-
-# === CRITICAL FIX STARTS ===
-# Fix permission errors
 RUN mkdir -p /home/node/.n8n && \
-    chown -R node:node /home/node/.n8n && \
-    chmod -R 755 /home/node
-# === CRITICAL FIX ENDS ===
+    chown -R node:node /home/node && \
+    chmod -R 777 /home/node && \
+    mkdir -p /data && \
+    chown -R node:node /data && \
+    chmod -R 777 /data
 
-# Browser setup
-ENV PUPPETEER_SKIP_CHROMIUM_DOWNLOAD=true \
+# Minimal required packages
+RUN apk update && apk add --no-cache bash curl chromium
+
+# Force config to writable location
+ENV N8N_CONFIG_PATH=/data \
+    RAILWAY_SHELL=enabled \
+    PUPPETEER_SKIP_CHROMIUM_DOWNLOAD=true \
     PUPPETEER_EXECUTABLE_PATH=/usr/bin/chromium-browser
 
-# Railway setup
+# Critical Railway health check
 HEALTHCHECK --interval=30s --timeout=10s \
   CMD curl -f http://localhost:5678/healthz || exit 1
-ENV RAILWAY_SHELL=enabled
 
-# Switch to non-root user
-ENV N8N_CONFIG_FILES=/data/config.json
 USER node
-
 EXPOSE 5678
