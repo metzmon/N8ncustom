@@ -1,15 +1,11 @@
 # ==============================================================================
-# === SUPERCHARGED N8N FOR RAILWAY (SIMPLE VERSION) ===========================
-# ==============================================================================
-# This gives your n8n extra powers for videos, images, and web scraping
-# ==============================================================================
-
 FROM n8nio/n8n:1.37.0
 
-# Switch to admin mode to install tools
+# === CRITICAL FIX STARTS ===
 USER root
+# === CRITICAL FIX ENDS ===
 
-# Install all tools at once
+# Install tools
 RUN apk update && \
     apk add --no-cache \
     ffmpeg \
@@ -25,17 +21,23 @@ RUN apk update && \
     python3 \
     py3-pip
 
-# Make Chromium work properly
-ENV PUPPETEER_SKIP_CHROMIUM_DOWNLOAD=true
-ENV PUPPETEER_EXECUTABLE_PATH=/usr/bin/chromium-browser
+# === CRITICAL FIX STARTS ===
+# Fix permission errors
+RUN mkdir -p /home/node/.n8n && \
+    chown -R node:node /home/node/.n8n && \
+    chmod -R 755 /home/node
+# === CRITICAL FIX ENDS ===
 
-# Fix for Railway shell access
+# Browser setup
+ENV PUPPETEER_SKIP_CHROMIUM_DOWNLOAD=true \
+    PUPPETEER_EXECUTABLE_PATH=/usr/bin/chromium-browser
+
+# Railway setup
 HEALTHCHECK --interval=30s --timeout=10s \
   CMD curl -f http://localhost:5678/healthz || exit 1
 ENV RAILWAY_SHELL=enabled
 
-# Switch back to safe mode
+# Switch to non-root user
 USER node
 
-# Open the n8n port
 EXPOSE 5678
