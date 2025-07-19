@@ -32,8 +32,13 @@ ENV PUPPETEER_SKIP_CHROMIUM_DOWNLOAD=true \
     PUPPETEER_EXECUTABLE_PATH=/usr/bin/chromium-browser \
     N8N_ENFORCE_SETTINGS_FILE_PERMISSIONS=true
 
-# 3) Switch back to the non-root user
-USER node
-
-# 4) Expose n8n’s default port
+# 3) Expose n8n’s default port
 EXPOSE 5678
+
+# 4) Create package.json with start command
+RUN echo '{"scripts": {"start": "n8n"}}' > /home/node/package.json
+
+# 5) Switch back to the non-root user and set entrypoint
+USER node
+WORKDIR /home/node
+CMD ["npm", "start"]
