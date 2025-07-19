@@ -31,10 +31,12 @@ RUN apk update && apk upgrade && \
     && \
     rm -rf /var/cache/apk/*
     
-RUN pnpm install \
-    n8n-nodes-elevenlabs@latest \
-    n8n-nodes-openai@latest \
-    n8n-nodes-google-drive@latest
+# Install community nodes globally via npm
+RUN npm install -g --unsafe-perm \
+      n8n-nodes-elevenlabs@latest \
+      n8n-nodes-openai@latest \
+      n8n-nodes-google-drive@latest \
+    && npm cache clean --force
     
 ENV PUPPETEER_SKIP_CHROMIUM_DOWNLOAD=true
 ENV PUPPETEER_EXECUTABLE_PATH=/usr/bin/chromium-browser
