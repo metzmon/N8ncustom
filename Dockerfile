@@ -3,6 +3,7 @@ FROM n8nio/n8n:1.37.0
 
 # === CRITICAL FIX STARTS ===
 USER root
+RUN mkdir -p /home/node/.n8n && chown -R node:node /home/node
 # === CRITICAL FIX ENDS ===
 
 # Install tools
@@ -38,6 +39,7 @@ HEALTHCHECK --interval=30s --timeout=10s \
 ENV RAILWAY_SHELL=enabled
 
 # Switch to non-root user
+ENV N8N_CONFIG_FILES=/data/config.json
 USER node
 
 EXPOSE 5678
