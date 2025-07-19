@@ -1,39 +1,20 @@
 # ==============================================================================
-# === N8N "SUPERCHARGED" DOCKERFILE FOR RAILWAY (VERSION 2 - ROBUST SYNTAX) ====
+# === SUPERCHARGED N8N FOR RAILWAY (SIMPLE VERSION) ===========================
 # ==============================================================================
-# Formål: At bygge et n8n-image med udvidede funktioner til medie-
-#         manipulation, web-scraping/browser-automatisering og andre værktøjer.
+# This gives your n8n extra powers for videos, images, and web scraping
 # ==============================================================================
 
-# Anvend et ARG-argument til nemt at kunne skifte n8n-version.
-# Det anbefales stærkt at låse til en specifik version i produktion.
-# Find nyeste versioner her: https://hub.docker.com/r/n8nio/n8n/tags
-ARG N8N_VERSION=latest
+FROM n8nio/n8n:1.37.0
 
-# Start fra den officielle n8n-image baseret på Alpine Linux for en lille størrelse.
-FROM n8nio/n8n:${N8N_VERSION}
-
-# Skift til 'root' brugeren for at få rettigheder til at installere pakker.
+# Switch to admin mode to install tools
 USER root
 
-# ==============================================================================
-# === INSTALLATION AF SYSTEMPAKKE-AFHÆNGIGHEDER ================================
-# ==============================================================================
-# Installer alle nødvendige pakker i et enkelt RUN-lag for at optimere caching
-# og holde image-størrelsen nede. Hver linje (undtagen den sidste i listen)
-# SKAL slutte med et backslash (\) for at signalere, at kommandoen fortsætter.
-RUN apk update && apk upgrade && \
+# Install all tools at once
+RUN apk update && \
     apk add --no-cache \
-    # --- Medie-manipulation ---
     ffmpeg \
     graphicsmagick \
-    # --- Browser-automatisering og Web-scraping ---
     chromium \
-    nss \
-    freetype \
-    harfbuzz \
-    ttf-freefont \
-    # --- Værktøjer til 'Execute Command' noden ---
     git \
     jq \
     curl \
@@ -41,18 +22,20 @@ RUN apk update && apk upgrade && \
     zip \
     unzip \
     bash \
-    # --- Andre nyttige pakker ---
     python3 \
-    py3-pip \
-    && \
-    # Ryd op i APK cache for at reducere image-størrelsen
-    rm -rf /var/cache/apk/*
+    py3-pip
 
-# ==============================================================================
-# === KONFIGURATION AF PUPPETEER TIL AT BRUGE SYSTEMETS CHROMIUM ===============
-# ==============================================================================
+# Make Chromium work properly
 ENV PUPPETEER_SKIP_CHROMIUM_DOWNLOAD=true
 ENV PUPPETEER_EXECUTABLE_PATH=/usr/bin/chromium-browser
 
-# Porten n8n lytter på internt.
+# Fix for Railway shell access
+HEALTHCHECK --interval=30s --timeout=10s \
+  CMD curl -f http://localhost:5678/healthz || exit 1
+ENV RAILWAY_SHELL=enabled
+
+# Switch back to safe mode
+USER node
+
+# Open the n8n port
 EXPOSE 5678
