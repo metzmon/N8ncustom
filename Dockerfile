@@ -27,13 +27,18 @@ RUN apk update && apk upgrade && \
     py3-pip \
     && rm -rf /var/cache/apk/*
 
-# --- Custom nodes installation into proper extension path ---
-# 0. Install pnpm globally first (required)
+# --- Install pnpm ---
 RUN npm install -g pnpm
 
-# 1. Install custom nodes properly
+# --- Install custom nodes ---
 RUN mkdir -p /home/node/.n8n/custom-nodes && \
     cd /home/node/.n8n/custom-nodes && \
+    pnpm add n8n-nodes-elevenlabs@latest \
+             n8n-nodes-openai@latest
+
+# --- Tell n8n to load from the custom extension path ---
+ENV N8N_CUSTOM_EXTENSIONS=/home/node/.n8n/custom-nodes
+
 
 # --- Make sure n8n loads those nodes ---
 ENV N8N_CUSTOM_EXTENSIONS=/home/node/.n8n/custom-nodes
