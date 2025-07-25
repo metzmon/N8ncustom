@@ -1,7 +1,7 @@
 # ==============================================================================
 # === N8N RAILWAY-OPTIMIZED DOCKERFILE (VOLUME PERMISSIONS FIXED) ============
 # ==============================================================================
-ARG N8N_VERSION=1.0.5
+ARG N8N_VERSION=latest
 FROM n8nio/n8n:${N8N_VERSION}
 
 # Switch to root for installations and permission fixes
