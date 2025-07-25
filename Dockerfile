@@ -1,13 +1,13 @@
 # ==============================================================================
-# === N8N RAILWAY-OPTIMIZED DOCKERFILE (STABLE & LIGHTWEIGHT) ================
+# === N8N RAILWAY-OPTIMIZED DOCKERFILE (VOLUME PERMISSIONS FIXED) ============
 # ==============================================================================
 ARG N8N_VERSION=1.0.5
 FROM n8nio/n8n:${N8N_VERSION}
 
-# Switch to root for installations
+# Switch to root for installations and permission fixes
 USER root
 
-# Install only essential packages to avoid conflicts
+# Install essential packages
 RUN apk update && apk upgrade && \
     apk add --no-cache \
     curl \
@@ -18,12 +18,17 @@ RUN apk update && apk upgrade && \
     && \
     rm -rf /var/cache/apk/*
 
+# Fix n8n directory permissions for Railway volumes
+RUN mkdir -p /home/node/.n8n && \
+    chown -R node:node /home/node/.n8n && \
+    chmod -R 755 /home/node/.n8n
+
 # Set proper environment variables
 ENV NODE_ENV=production
 ENV N8N_LOG_LEVEL=info
 ENV GENERIC_TIMEZONE=UTC
 
-# Switch back to node user for security
+# Switch back to node user AFTER fixing permissions
 USER node
 
 # Expose n8n port
